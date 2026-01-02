@@ -32,10 +32,6 @@ from TechVJ.bot.clients import initialize_clients
 ppath = "plugins/*.py"
 files = glob.glob(ppath)
 
-# ---------------- START CLIENTS ----------------
-TechVJBot.start()
-TechVJBackUpBot.start()
-
 # ---------------- HEARTBEAT -------------------
 async def heartbeat():
     while True:
@@ -46,6 +42,10 @@ async def heartbeat():
 async def start():
     print('\n')
     print('Initializing Your Bot')
+
+    # ✅ START PYROGRAM CLIENTS (CORRECT WAY)
+    await TechVJBot.start()
+    await TechVJBackUpBot.start()
 
     bot_info = await TechVJBot.get_me()
     await initialize_clients()
@@ -65,7 +65,6 @@ async def start():
     if ON_HEROKU:
         asyncio.create_task(ping_server())
 
-    me = await TechVJBot.get_me()
     tz = pytz.timezone('Asia/Kolkata')
     today = date.today()
     now = datetime.now(tz)

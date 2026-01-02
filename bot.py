@@ -17,10 +17,11 @@ logging.basicConfig(
 logging.getLogger("aiohttp").setLevel(logging.ERROR)
 logging.getLogger("aiohttp.web").setLevel(logging.ERROR)
 
-from pyrogram import idle
+from pyrogram import Client, idle 
 from info import *
-from Script import script
-from datetime import date, datetime
+from typing import Union, Optional, AsyncGenerator
+from Script import script 
+from datetime import date, datetime 
 from aiohttp import web
 from plugins import web_server
 
@@ -28,28 +29,18 @@ from TechVJ.bot import TechVJBot, TechVJBackUpBot
 from TechVJ.util.keepalive import ping_server
 from TechVJ.bot.clients import initialize_clients
 
-# ---------------- LOAD PLUGINS ----------------
 ppath = "plugins/*.py"
 files = glob.glob(ppath)
+TechVJBot.start()
+TechVJBackUpBot.start()
+loop = asyncio.get_event_loop()
 
-# ---------------- HEARTBEAT -------------------
-async def heartbeat():
-    while True:
-        logging.info("💓 Bot is alive")
-        await asyncio.sleep(60)
 
-# ---------------- MAIN START ------------------
 async def start():
     print('\n')
-    print('Initializing Your Bot')
-
-    # ✅ START PYROGRAM CLIENTS (CORRECT WAY)
-    await TechVJBot.start()
-    await TechVJBackUpBot.start()
-
+    print('Initalizing Your Bot')
     bot_info = await TechVJBot.get_me()
     await initialize_clients()
-
     for name in files:
         with open(name) as a:
             patt = Path(a.name)
@@ -61,35 +52,24 @@ async def start():
             spec.loader.exec_module(load)
             sys.modules["plugins." + plugin_name] = load
             print("Tech VJ Imported => " + plugin_name)
-
     if ON_HEROKU:
         asyncio.create_task(ping_server())
-
+    me = await TechVJBot.get_me()
     tz = pytz.timezone('Asia/Kolkata')
     today = date.today()
     now = datetime.now(tz)
     time = now.strftime("%H:%M:%S %p")
-
-    await TechVJBot.send_message(
-        chat_id=LOG_CHANNEL,
-        text=script.RESTART_TXT.format(today, time)
-    )
-
-    # -------- WEB SERVER --------
+    await TechVJBot.send_message(chat_id=LOG_CHANNEL, text=script.RESTART_TXT.format(today, time))
     app = web.AppRunner(await web_server())
     await app.setup()
     bind_address = "0.0.0.0"
     await web.TCPSite(app, bind_address, PORT).start()
-
-    # -------- HEARTBEAT ---------
-    asyncio.create_task(heartbeat())
-
-    # -------- KEEP BOT ALIVE ----
     await idle()
 
-# ---------------- ENTRY POINT -----------------
+
 if __name__ == '__main__':
     try:
-        asyncio.run(start())
+        loop.run_until_complete(start())
     except KeyboardInterrupt:
         logging.info('Service Stopped Bye 👋')
+

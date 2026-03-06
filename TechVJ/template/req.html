@@ -212,9 +212,33 @@
     });
     </script>
 	<script src="https://pl28854215.effectivegatecpm.com/c7/0e/74/c70e74a1c113b8eb82655588a8518422.js"></script>
-    
+    <script>
+// Disable PrintScreen
+document.addEventListener("keyup", function(e) {
+    if (e.key === "PrintScreen") {
+        document.body.innerHTML = "";
+        alert("Screenshot is disabled on this page");
+    }
+});
+
+// Pause video if screen recording or tab change
+document.addEventListener("visibilitychange", function() {
+    if (document.hidden) {
+        var v = document.getElementById("player");
+        if(v){
+            v.pause();
+        }
+    }
+});
+
+// Disable text select
+document.addEventListener("selectstart", function(e){
+    e.preventDefault();
+});
+</script>
 </body>
 </html>
 
 <!--  Don't Remove Credit @VJ_Bot Subscribe YouTube Channel For Amazing Bot @Tech_VJ Ask Doubt on telegram @KingVJ01 -->
+
 
